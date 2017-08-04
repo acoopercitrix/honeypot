@@ -5,7 +5,7 @@ const country_codes = require('node-iso-3166')
 
 mongoClient.connect(mongoUrl, function(err, db) {
 	if (err) throw err;
-	db.collection("session").aggregate([ { $match: { "timestamp": { "$gte": new Date("2017-07-25"), "$lt": new Date("2017-07-26") }}}, { $group: { _id: "$geoip.country", "count": { "$sum": 1 }} }]).toArray((err, results) => {
+	db.collection("session").aggregate([ { $group: { _id: "$geoip.country", "count": { "$sum": 1 }} }]).toArray((err, results) => {
 		if (err) throw err;
 		for (var i = 0; i < results.length; i++) {
 			result = results[i];

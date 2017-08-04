@@ -4,7 +4,9 @@ const pollInterval = 1500;
 const mongoClient = require('mongodb').MongoClient;
 const mongoUrl = "mongodb://localhost:27017/mnemosyne";
 // All our data was recorded on this date, we repeat it each day
-const referenceDate = new Date("2017-07-25");
+//const referenceDate = new Date("2017-07-25");
+// Javascript date month starts at zero, so 6=July
+const referenceDate = new Date(2017,6,25);
 
 function AttackEvent() {
 	this.started = false;
@@ -41,10 +43,16 @@ AttackEvent.prototype.poll = function() {
 	thisPollTime = Date.now();
 	// recalculate the reference date, we may have tripped over midnight
 	today = new Date();
-	dateOffset = referenceDate - new Date(today.getFullYear(), today.getMonth(), today.getDate());
+	dateOffset = referenceDate - new Date(today.getFullYear(),
+		today.getMonth(), today.getDate());
 	this.timeSinceLastPing += pollInterval;
 	// Find all attack events which occurred since last poll
-		this.db.collection("session").find({ "timestamp": { "$gte": new Date(this.lastPollTime+dateOffset), "$lt": new Date(thisPollTime+dateOffset) }}).toArray((err, results) => {
+	this.db.collection("session").find(
+		{ "timestamp": {
+			"$gte": new Date(this.lastPollTime+dateOffset), 
+			"$lt": new Date(thisPollTime+dateOffset)
+		}}
+	).toArray((err, results) => {
 		if (err) throw err;
 		for (var i = 0; i < results.length; i++) {
 			//console.log("Got a result");
